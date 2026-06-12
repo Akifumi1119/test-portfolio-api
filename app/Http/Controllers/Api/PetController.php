@@ -8,9 +8,9 @@ use Illuminate\Http\Request;
 
 class PetController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        return Pet::all();
+        return $request->user()->pets;
     }
 
     public function store(Request $request)
@@ -21,13 +21,15 @@ class PetController extends Controller
             'birthday' => ['required', 'date'],
         ]);
 
-        $pet = Pet::create($validated);
+        $pet = $request->user()->pets()->create($validated);
 
         return response()->json($pet, 201);
     }
 
     public function update(Request $request, Pet $pet)
     {
+        $this->authorize('update', $pet);
+
         $validated = $request->validate([
             'name' => ['required', 'string', 'max:255'],
             'type' => ['required', 'string', 'max:255'],
@@ -39,17 +41,19 @@ class PetController extends Controller
         return response()->json($pet);
     }
 
-    public function show(Pet $pet)
+    public function show(Request $request, Pet $pet)
     {
+        $this->authorize('view', $pet);
+
         return response()->json($pet);
     }
 
     public function destroy(Pet $pet)
     {
+        $this->authorize('delete', $pet);
+
         $pet->delete();
 
-        return response()->json([
-            'message' => '削除しました',
-        ]);
+        return response()->json(['message' => '削除しました']);
     }
 }
