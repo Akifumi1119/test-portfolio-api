@@ -22,7 +22,7 @@ WORKDIR /app
 COPY . .
 
 # --no-scripts でビルド時の php artisan 実行をスキップ（.envがないため）
-RUN COMPOSER_MEMORY_LIMIT=-1 composer install --no-dev --optimize-autoloader --no-scripts \
+RUN COMPOSER_MEMORY_LIMIT=-1 composer install --no-dev --optimize-autoloader --no-scripts --ignore-platform-reqs \
     && chmod -R 775 storage bootstrap/cache
 
 EXPOSE 10000
