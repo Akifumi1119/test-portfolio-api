@@ -21,12 +21,15 @@ WORKDIR /app
 
 COPY . .
 
-RUN COMPOSER_MEMORY_LIMIT=-1 composer install --no-dev --optimize-autoloader \
+# --no-scripts でビルド時の php artisan 実行をスキップ（.envがないため）
+RUN COMPOSER_MEMORY_LIMIT=-1 composer install --no-dev --optimize-autoloader --no-scripts \
     && chmod -R 775 storage bootstrap/cache
 
 EXPOSE 10000
 
-CMD php artisan config:cache \
+# 起動時に package:discover → config cache → migrate → サーバー起動
+CMD php artisan package:discover --ansi \
+    && php artisan config:cache \
     && php artisan route:cache \
     && php artisan migrate --force \
     && php artisan serve --host=0.0.0.0 --port=${PORT:-10000}
