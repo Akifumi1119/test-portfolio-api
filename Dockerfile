@@ -1,8 +1,18 @@
 FROM php:8.3-cli
 
 RUN apt-get update && apt-get install -y \
-    libpq-dev zip unzip git curl \
-    && docker-php-ext-install pdo pdo_pgsql \
+    libpq-dev \
+    libonig-dev \
+    libxml2-dev \
+    libzip-dev \
+    zip unzip git curl \
+    && docker-php-ext-install \
+        pdo \
+        pdo_pgsql \
+        mbstring \
+        xml \
+        zip \
+        bcmath \
     && rm -rf /var/lib/apt/lists/*
 
 COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
@@ -11,7 +21,7 @@ WORKDIR /app
 
 COPY . .
 
-RUN composer install --no-dev --optimize-autoloader \
+RUN COMPOSER_MEMORY_LIMIT=-1 composer install --no-dev --optimize-autoloader \
     && chmod -R 775 storage bootstrap/cache
 
 EXPOSE 10000
