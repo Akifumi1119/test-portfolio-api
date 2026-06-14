@@ -1,4 +1,4 @@
-FROM php:8.3-cli
+FROM php:8.4-cli
 
 RUN apt-get update && apt-get install -y \
     libpq-dev \
@@ -22,7 +22,7 @@ WORKDIR /app
 COPY . .
 
 # --no-scripts でビルド時の php artisan 実行をスキップ（.envがないため）
-RUN COMPOSER_MEMORY_LIMIT=-1 composer install --no-dev --optimize-autoloader --no-scripts --ignore-platform-reqs \
+RUN COMPOSER_MEMORY_LIMIT=-1 composer install --no-dev --optimize-autoloader --no-scripts \
     && chmod -R 775 storage bootstrap/cache
 
 EXPOSE 10000
